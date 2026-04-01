@@ -1,0 +1,57 @@
+prefix: "&8[&bPsBan&8] &r"
+
+no-permission: "&cNo tienes permiso para hacer esto."
+only-player: "&cEste comando solo puede usarse como jugador."
+player-not-found: "&cJugador &e{player} &cno encontrado."
+invalid-player-name: "&cEl nombre &e{player} &cno es válido. Usa solo letras, números y _."
+invalid-duration: "&cLa duración &e{duration} &cno es válida. Ejemplos: &e30m, 12h, 7d, 2w, perm"
+reason-required: "&cDebes indicar un motivo."
+
+help:
+  header: "&8&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━&r &bPsBan 2.0 &8&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  ban:     "&e/ps ban &f<jugador> [región] [tiempo] [motivo] &8- Detecta región y tiempo automáticamente."
+  unban:   "&e/ps unban &f<jugador> [región] &8- Desbanea a un jugador."
+  bypass:  "&e/ps bypass &f[on|off] &8- Activa/desactiva el bypass."
+  banlist: "&e/ps banlist &f[región] [página] &8- Lista los baneados activos de una región."
+  history: "&e/ps history &f<región> [página] &8- Historial completo de una región."
+
+banned:
+  enter: "&cNo puedes entrar a &e{protection}&c. Tiempo restante: &e{duration}&c. Motivo: &e{reason}&c."
+  tp: "&cNo puedes teleportarte a &e{protection}&c. Tiempo restante: &e{duration}&c. Motivo: &e{reason}&c."
+  join: "&cEstabas dentro de &e{protection}&c y has sido enviado al spawn. Tiempo restante: &e{duration}&c. Motivo: &e{reason}&c."
+  staff-enter: "&7[Staff] &e{player} &7intentó entrar a &e{region} &7(baneado)."
+  staff-tp: "&7[Staff] &e{player} &7intentó teleportarse a &e{region} &7(baneado)."
+  staff-join: "&7[Staff] &e{player} &7ha entrado estando baneado en &e{region} &7y fue enviado al spawn."
+
+ban:
+  usage: "&cUso: /ps ban <jugador> [región] [tiempo] [motivo]"
+  no-region: "&cNo se encontró ninguna región. Especifica una o párate encima de una."
+  not-owner: "&cNo eres el dueño de esa protección."
+  already-banned: "&e{player} &cya está baneado de la región &e{region}&c."
+  success: "&aJugador &e{player} &abaneado de &e{region}&a. Duración: &e{duration}&a. Motivo: &e{reason}&a."
+  notified: "&cHas sido baneado de &e{protection}&c. Duración: &e{duration}&c. Motivo: &e{reason}&c."
+  ejected: "&cHas sido expulsado al spawn porque estás baneado de &e{protection}&c. Tiempo restante: &e{duration}&c. Motivo: &e{reason}&c."
+  staff-notify: "&7[PsBan] &e{banner} &7baneó a &e{player} &7de &e{region} &7(&e{duration}&7). Motivo: &e{reason}&7."
+
+unban:
+  usage: "&cUso: /ps unban <jugador> [región]"
+  no-region: "&cNo se encontró ninguna región. Especifica una o párate encima de una."
+  not-owner: "&cNo eres el dueño de esa protección."
+  not-banned: "&e{player} &cno está baneado en la región &e{region}&c."
+  success: "&aBaneo de &e{player} &aen &e{region} &aeliminado correctamente."
+
+bypass:
+  on: "&aBypass activado. Puedes entrar a regiones baneadas."
+  off: "&cBypass desactivado."
+
+banlist:
+  no-region: "&cNo se encontró ninguna región. Especifica una o párate encima de una."
+  empty: "&7No hay jugadores baneados en la región &e{region}&7."
+  header: "&8&m━━━━━━━━━━━━━━&r &bBaneados en &e{region} &8— &7Pág. &f{page}&8/&f{total} &8&m━━━━━━━━━━━━━━"
+  entry: "&f- &e{player} &7| &f{duration} &7| &b{reason} &7| por &e{banner}"
+
+history:
+  usage: "&cUso: /ps history <región> [página]"
+  empty: "&7No hay historial de baneos en la región &e{region}&7."
+  header: "&8&m━━━━━━━━━━━━━━&r &bHistorial de &e{region} &8— &7Pág. &f{page}&8/&f{total} &8&m━━━━━━━━━━━━━━"
+  entry: "&f- &e{player} &7| &b{reason} &7| por &e{banner} &7| &f{date} &7| expira: &f{expire} &7| &a{status}"
