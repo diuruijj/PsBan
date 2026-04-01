@@ -1,36 +1,34 @@
-# ╔══════════════════════════════════╗
-# ║       PsBan  ·  config.yml       ║
-# ╚══════════════════════════════════╝
+#
+#   ██████╗██████╗ ██╗███╗  ██╗███╗  ██╗██╗███╗  ██╗
+#  ██╔════╝██╔══██╗██║████╗ ██║████╗ ██║██║████╗ ██║
+#  ╚█████╗░██████╔╝██║██╔██╗██║██╔██╗██║██║██╔██╗██║
+#   ╚═══██╗██╔═══╝ ██║██║╚████║██║╚████║██║██║╚████║
+#  ██████╔╝██║     ██║██║ ╚███║██║ ╚███║██║██║ ╚███║
+#  ╚═════╝ ╚═╝     ╚═╝╚═╝  ╚══╝╚═╝  ╚══╝╚═╝╚═╝  ╚══╝
+#
 
+# By the Spinnin34 and Diuruijj
+
+
+debug: false
 # Fuerza del empuje cuando un jugador baneado intenta entrar
 push-force: 1.2
-
 # Cooldown entre mensajes al mismo jugador (ms)
 message-cooldown-ms: 3000
-
 # Razón por defecto cuando no se especifica
 default-reason: "No especificada"
-
 # Obligar a usar razón en /ps ban
 require-reason: false
-
 # Guardar acciones también en psban.log
 log-to-file: true
-
 # Si intentan teleportarse a una región baneada, mándalos al spawn
 teleport-to-spawn-on-ban: true
-
 # Al banear a alguien que está dentro de la región, intenta ejecutar /spawn al instante
 run-spawn-command-on-ban: true
-
 # Modo del comando de spawn: PLAYER o CONSOLE
 spawn-command-mode: "PLAYER"
-
 # Comando a ejecutar. Si usas CONSOLE puedes poner {player}, por ejemplo: "spawn {player}"
 spawn-command: "spawn"
-
-# Si falla el comando de spawn, usa el spawn del mundo como fallback
-fallback-teleport-to-world-spawn: true
 
 # Compatibilidad con la config antigua
 storage:

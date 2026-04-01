@@ -1,0 +1,16 @@
+name: PsBan
+version: '2.1'
+main: p.psban.PsBanPlugin
+api-version: '1.21'
+description: Ban de jugadores por región de ProtectionStones con detección automática de tiempo, región actual por defecto y empuje por vectores.
+author: diuruijj, Spinnin
+dependencies:
+  server:
+    ProtectionStones:
+      load: BEFORE
+      required: true
+      join-classpath: true
+    WorldGuard:
+      load: BEFORE
+      required: true
+      join-classpath: true

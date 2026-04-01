@@ -1,10 +1,12 @@
 package p.psban.manager;
 
+import org.bukkit.entity.Player;
 import p.psban.PsBanPlugin;
-import p.psban.db.Database;
-import p.psban.db.MySQLDatabase;
-import p.psban.db.SQLiteDatabase;
+import p.psban.storage.Database;
+import p.psban.storage.SQLiteDatabase;
+import p.psban.messages.LangUtil;
 import p.psban.model.BanEntry;
+import p.psban.util.DurationUtil;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -15,6 +17,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BanManager {
+
     private final PsBanPlugin plugin;
     private final Database db;
     private final Map<String, Boolean> banCache = new ConcurrentHashMap<>();
@@ -23,8 +26,7 @@ public class BanManager {
 
     public BanManager(PsBanPlugin plugin) {
         this.plugin = plugin;
-        String type = plugin.getConfig().getString("storage.type", "sqlite").toLowerCase();
-        this.db = type.equals("mysql") ? new MySQLDatabase(plugin) : new SQLiteDatabase(plugin);
+        this.db = new SQLiteDatabase(plugin);
         try {
             db.init();
         } catch (Exception ex) {
@@ -36,111 +38,136 @@ public class BanManager {
         return uuid + "::" + region.toLowerCase();
     }
 
-    public void ban(UUID uuid, String playerName, String region, String bannedBy, String reason, long durationMs) {
-        BanEntry entry = new BanEntry(uuid, playerName, region, bannedBy, reason, durationMs);
+    public void ban(UUID uuid, String name, String region, String bannedBy, String reason, long durationMs) {
         try {
-            db.addBan(entry);
+            db.addBan(new BanEntry(uuid, name, region, bannedBy, reason, durationMs));
             banCache.put(key(uuid, region), true);
         } catch (Exception ex) {
-            plugin.getLogger().warning("No se pudo guardar el baneo: " + ex.getMessage());
+            if (plugin.getConfig().getBoolean("debug", false)) {
+                plugin.getLogger().warning("No se pudo guardar el baneo: " + ex.getMessage());
+            }
         }
     }
 
     public boolean unban(UUID uuid, String region) {
         try {
-            boolean changed = db.removeBan(uuid, region);
-            if (changed) banCache.remove(key(uuid, region));
-            return changed;
+            boolean ok = db.removeBan(uuid, region);
+            if (ok) banCache.remove(key(uuid, region));
+            return ok;
         } catch (Exception ex) {
-            plugin.getLogger().warning("No se pudo desbanear: " + ex.getMessage());
+            if (plugin.getConfig().getBoolean("debug", false)) {
+                plugin.getLogger().warning("No se pudo desbanear: " + ex.getMessage());
+            }
             return false;
         }
     }
 
     public boolean isBanned(UUID uuid, String region) {
-        String key = key(uuid, region);
-        Boolean cached = banCache.get(key);
+        String k = key(uuid, region);
+        Boolean cached = banCache.get(k);
         if (cached != null && !cached) return false;
         try {
             boolean banned = db.isBanned(uuid, region);
-            banCache.put(key, banned);
+            banCache.put(k, banned);
             return banned;
         } catch (Exception ex) {
-            plugin.getLogger().warning("No se pudo comprobar el baneo: " + ex.getMessage());
+            if (plugin.getConfig().getBoolean("debug", false)) {
+                plugin.getLogger().warning("No se pudo comprobar el baneo: " + ex.getMessage());
+            }
             return false;
         }
     }
 
     public BanEntry getActiveBan(UUID uuid, String region) {
-        try {
-            return db.getActiveBan(uuid, region);
-        } catch (Exception ex) {
-            plugin.getLogger().warning("No se pudo leer el baneo activo: " + ex.getMessage());
+        try { return db.getActiveBan(uuid, region); }
+        catch (Exception ex) {
+            if (plugin.getConfig().getBoolean("debug", false)) {
+                plugin.getLogger().warning("No se pudo leer el baneo activo: " + ex.getMessage());
+            }
             return null;
         }
     }
 
-    public void purgeExpired() {
-        try {
-            db.purgeExpired();
-            banCache.clear();
-        } catch (Exception ex) {
-            plugin.getLogger().warning("No se pudieron limpiar los baneos caducados: " + ex.getMessage());
-        }
-    }
-
     public List<BanEntry> getActiveBans(String region) {
-        try {
-            return db.getActiveBans(region);
-        } catch (Exception ex) {
-            plugin.getLogger().warning("No se pudieron listar los baneos: " + ex.getMessage());
+        try { return db.getActiveBans(region); }
+        catch (Exception ex) {
+            if (plugin.getConfig().getBoolean("debug", false)) {
+                plugin.getLogger().warning("No se pudieron listar los baneos: " + ex.getMessage());
+            }
             return List.of();
         }
     }
 
     public List<BanEntry> getHistory(String region, int limit, int offset) {
-        try {
-            return db.getHistory(region, limit, offset);
-        } catch (Exception ex) {
-            plugin.getLogger().warning("No se pudo leer el historial: " + ex.getMessage());
+        try { return db.getHistory(region, limit, offset); }
+        catch (Exception ex) {
+            if (plugin.getConfig().getBoolean("debug", false)) {
+                plugin.getLogger().warning("No se pudo leer el historial: " + ex.getMessage());
+            }
             return List.of();
         }
     }
 
     public int countHistory(String region) {
-        try {
-            return db.countHistory(region);
-        } catch (Exception ex) {
-            plugin.getLogger().warning("No se pudo contar el historial: " + ex.getMessage());
+        try { return db.countHistory(region); }
+        catch (Exception ex) {
+            if (plugin.getConfig().getBoolean("debug", false)) {
+                plugin.getLogger().warning("No se pudo contar el historial: " + ex.getMessage());
+            }
             return 0;
         }
     }
 
-    public void setBypass(UUID uuid, boolean enabled) {
-        if (enabled) bypassSet.add(uuid);
-        else bypassSet.remove(uuid);
+    public void purgeExpired() {
+        try { db.purgeExpired(); banCache.clear(); }
+        catch (Exception ex) {
+            if (plugin.getConfig().getBoolean("debug", false)) {
+                plugin.getLogger().warning("No se pudieron limpiar los baneos caducados: " + ex.getMessage());
+            }
+        }
     }
 
-    public boolean hasBypass(UUID uuid) {
-        return bypassSet.contains(uuid);
+    public void setBypass(UUID uuid, boolean enabled) {
+        if (enabled) bypassSet.add(uuid); else bypassSet.remove(uuid);
     }
+
+    public boolean hasBypass(UUID uuid) { return bypassSet.contains(uuid); }
 
     public boolean checkMsgCooldown(UUID uuid) {
         long cooldown = plugin.getConfig().getLong("message-cooldown-ms", 3000L);
         long now = System.currentTimeMillis();
-        long last = msgCooldown.getOrDefault(uuid, 0L);
-        if (now - last >= cooldown) {
+        if (now - msgCooldown.getOrDefault(uuid, 0L) >= cooldown) {
             msgCooldown.put(uuid, now);
             return true;
         }
         return false;
     }
 
-    public void close() {
-        db.close();
+    public void ejectPlayerToSpawn(Player player, String regionId, String messagePath) {
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            try {
+                player.teleport(player.getWorld().getSpawnLocation());
+            } catch (Exception ex) {
+                plugin.getLogger().warning("No se pudo teleportar al spawn de " + player.getName() + ": " + ex.getMessage());
+                return;
+            }
+
+            if (messagePath == null || messagePath.isBlank()) return;
+
+            BanEntry entry = getActiveBan(player.getUniqueId(), regionId);
+            String duration = "permanente";
+            String reason = "No especificada";
+
+            if (entry != null) {
+                if (!entry.isPermanent()) duration = DurationUtil.format(entry.remainingMs());
+                if (entry.getReason() != null && !entry.getReason().isBlank()) reason = entry.getReason();
+            }
+
+            player.sendMessage(LangUtil.prefixed(messagePath,
+                    "region", regionId, "protection", regionId,
+                    "duration", duration, "reason", reason));
+        });
     }
 
-    public void saveAll() {
-        db.close();
-    }
+    public void close() { db.close(); }
 }
